@@ -1,9 +1,15 @@
 from functools import wraps
-
-from flask import Blueprint, current_app, flash, redirect, render_template, request, send_file, session, url_for
 from io import BytesIO
 
+from flask import Blueprint, current_app, flash, redirect, render_template, request, send_file, session, url_for
+
 bp = Blueprint("portal", __name__)
+
+ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'csv', 'json', 'md'}
+
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
 def admin_required(view):
@@ -52,6 +58,8 @@ def upload():
     upload = request.files.get("file")
     if not upload or not upload.filename:
         flash("Choose a file", "error")
+    elif not allowed_file(upload.filename):
+        flash(f"Invalid file type. Allowed: {', '.join(ALLOWED_EXTENSIONS)}", "error")
     else:
         service = current_app.extensions["vault"]
         factor = int(request.form.get("replication_factor", current_app.config["DEFAULT_REPLICATION_FACTOR"]))

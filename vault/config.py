@@ -29,4 +29,4 @@ class Config:
     DEFAULT_REPLICATION_FACTOR = int(os.getenv("DEFAULT_REPLICATION_FACTOR", "3"))
     ADMIN_USERNAME = os.getenv("ADMIN_USERNAME", "admin")
     ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD", "admin")
-    MAX_CONTENT_LENGTH = 512 * 1024 * 1024
+    MAX_CONTENT_LENGTH = 16 * 1024 * 1024  # 16 MB limit for hackathon free tier
