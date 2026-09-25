@@ -149,8 +149,10 @@ activemq-data/
 
 # Environments
 .env
+.venv/
+data/
+storage/
 .envrc
-.venv
 env/
 venv/
 ENV/
@@ -216,3 +218,10 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Local SQLite databases and journals
+*.sqlite3
+*.sqlite3-*
+
+AGENTS.md
+PLAN.md

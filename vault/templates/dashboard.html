@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>{{ "Admin Portal" if admin else "Vault" }}</h1>
+<p>{{ "Authenticated fault injection and repair controls." if admin else "Normal object storage and cluster state." }}</p>
+
+<div class="grid">
+  <section>
+    <h2>Nodes</h2>
+    {% for node in nodes %}
+    <article class="card">
+      <b>{{ node.id }}</b>
+      <span class="state {{ node.state|lower }}">{{ node.state }}</span>
+      {% if admin %}
+      <form method="post" action="{{ url_for('portal.node_action', node_id=node.id, action='restore' if node.state == 'FAILED' else 'fail') }}">
+        <button>{{ 'Restore' if node.state == 'FAILED' else 'Fail node' }}</button>
+      </form>
+      {% endif %}
+    </article>
+    {% endfor %}
+  </section>
+  <section>
+    <h2>Create object</h2>
+    <form method="post" action="{{ url_for('portal.upload') }}" enctype="multipart/form-data">
+      <label>Real file<input type="file" name="file" required></label>
+      <label>Replication factor<input type="number" name="replication_factor" min="1" value="3"></label>
+      <button class="primary">Upload</button>
+    </form>
+    <hr>
+    <form method="post" action="{{ url_for('portal.simulated') }}">
+      <label>Simulated filename<input name="filename" value="large-demo.bin"></label>
+      <label>Logical size (bytes)<input type="number" name="size" value="500000000" min="0"></label>
+      <label>Replication factor<input type="number" name="replication_factor" min="1" value="3"></label>
+      <button class="primary">Create simulated</button>
+    </form>
+  </section>
+</div>
+
+<section>
+  <h2>Objects</h2>
+  {% for obj in objects %}
+    <article class="object">
+    <div>
+      <b>{{ obj.filename }}</b>
+      <small>{{ obj.id }} · {{ obj.kind }} · logical {{ obj.size }} bytes · physical {{ obj.physical_size }} bytes · SHA-256 {{ obj.checksum }}</small>
+      <span class="state {{ obj.state|lower }}">{{ obj.state }}</span>
+      <small>replicas {{ obj.verified_replica_count }}/{{ obj.replication_factor }}</small>
+    </div>
+    {% if obj.kind == 'real' %}<a href="{{ url_for('portal.download', object_id=obj.id) }}">Retrieve</a>{% endif %}
+    {% if admin %}<form method="post" action="{{ url_for('portal.verify_object', object_id=obj.id) }}"><button>Verify and repair</button></form>{% endif %}
+    <div class="replicas">
+      {% for replica in obj.replicas %}
+      <span>{{ replica.node_id }}: {{ replica.state }}</span>
+      {% if admin %}
+      <form method="post" action="{{ url_for('portal.replica_action', object_id=obj.id, node_id=replica.node_id, action='remove') }}"><button>Remove</button></form>
+      <form method="post" action="{{ url_for('portal.replica_action', object_id=obj.id, node_id=replica.node_id, action='corrupt') }}"><button>Corrupt</button></form>
+      <form method="post" action="{{ url_for('portal.replica_action', object_id=obj.id, node_id=replica.node_id, action='stale') }}"><button>Stale</button></form>
+      {% endif %}
+      {% endfor %}
+    </div>
+  </article>
+  {% else %}<p>No objects yet.</p>{% endfor %}
+</section>
+{% if admin %}
+<section>
+  <h2>Recent operation history</h2>
+  {% for event in events %}
+  <article class="event">
+    <small>{{ event.created_at }} · {{ event.event_type }}</small>
+    <div>{{ event.message }}</div>
+    {% if event.object_id %}<small>object {{ event.object_id }}</small>{% endif %}
+    {% if event.node_id %}<small>node {{ event.node_id }}</small>{% endif %}
+    {% if event.source_node or event.destination_node %}
+    <small>source {{ event.source_node or 'none' }} · destination {{ event.destination_node or 'none' }}</small>
+    {% endif %}
+    {% if event.expected_checksum %}<small>expected {{ event.expected_checksum }}{% if event.actual_checksum %} · actual {{ event.actual_checksum }}{% endif %}</small>{% endif %}
+  </article>
+  {% else %}<p>No operations recorded.</p>{% endfor %}
+</section>
+{% endif %}
+{% endblock %}
