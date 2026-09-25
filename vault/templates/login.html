@@ -1,1 +1,32 @@
-{% extends "base.html" %}{% block content %}<section class="login"><h1>Administrator access</h1><form method="post"><label>Username<input name="username" required></label><label>Password<input name="password" type="password" required></label><button class="primary">Sign in</button></form><p>Credentials come from <code>ADMIN_USERNAME</code> and <code>ADMIN_PASSWORD</code>.</p></section>{% endblock %}
+{% extends "base.html" %}
+{% block title %}Admin Login{% endblock %}
+{% block subtitle %}Authenticate to access fault injection controls{% endblock %}
+
+{% block content %}
+<div class="login-container">
+  <section class="panel login-panel">
+    <header class="panel-header text-center border-b-0 pb-0">
+      <div class="login-icon mx-auto mb-3">
+        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-primary"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+      </div>
+      <h2>Administrator Access</h2>
+    </header>
+    <div class="panel-body">
+      <form method="post" class="form-group">
+        <div class="input-group">
+          <label>Username</label>
+          <input name="username" class="form-control" required autofocus>
+        </div>
+        <div class="input-group mt-3">
+          <label>Password</label>
+          <input name="password" type="password" class="form-control" required>
+        </div>
+        <button class="btn btn-primary w-full mt-4">Sign in</button>
+      </form>
+      <div class="login-help text-center mt-4 text-muted text-sm">
+        <p>Credentials are configured via <br><code>ADMIN_USERNAME</code> and <code>ADMIN_PASSWORD</code>.</p>
+      </div>
+    </div>
+  </section>
+</div>
+{% endblock %}
