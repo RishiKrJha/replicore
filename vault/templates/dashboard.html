@@ -40,14 +40,15 @@
         <form method="post" action="{{ url_for('portal.upload') }}" enctype="multipart/form-data" class="form-group mb-4">
           <h4 class="form-section-title">Real File Upload</h4>
           <div class="input-group">
-            <input type="file" name="file" class="form-control" required>
+            <label for="file_upload" style="display:none;">Choose file</label>
+            <input id="file_upload" type="file" name="file" class="form-control" required aria-required="true">
           </div>
           <div class="flex-row items-end">
             <div class="input-group flex-1">
-              <label>Replication Factor</label>
-              <input type="number" name="replication_factor" class="form-control" min="1" value="3">
+              <label for="rep_factor_real">Replication Factor</label>
+              <input id="rep_factor_real" type="number" name="replication_factor" class="form-control" min="1" value="3">
             </div>
-            <button class="btn btn-primary ml-2 mb-1">Upload File</button>
+            <button type="submit" class="btn btn-primary ml-2 mb-1" aria-label="Upload File">Upload File</button>
           </div>
         </form>
         
@@ -56,20 +57,20 @@
         <form method="post" action="{{ url_for('portal.simulated') }}" class="form-group">
           <h4 class="form-section-title">Create Simulated Object</h4>
           <div class="input-group">
-            <label>Simulated filename</label>
-            <input name="filename" class="form-control" value="large-demo.bin">
+            <label for="sim_filename">Simulated filename</label>
+            <input id="sim_filename" name="filename" class="form-control" value="large-demo.bin">
           </div>
           <div class="flex-row">
             <div class="input-group flex-1 mr-2">
-              <label>Logical size (bytes)</label>
-              <input type="number" name="size" class="form-control" value="10000000" min="0">
+              <label for="sim_size">Logical size (bytes)</label>
+              <input id="sim_size" type="number" name="size" class="form-control" value="10000000" min="0">
             </div>
             <div class="input-group flex-1">
-              <label>Replication Factor</label>
-              <input type="number" name="replication_factor" class="form-control" min="1" value="3">
+              <label for="sim_rep_factor">Replication Factor</label>
+              <input id="sim_rep_factor" type="number" name="replication_factor" class="form-control" min="1" value="3">
             </div>
           </div>
-          <button class="btn btn-secondary w-full mt-3">Create simulated object</button>
+          <button type="submit" class="btn btn-secondary w-full mt-3" aria-label="Create simulated object">Create simulated object</button>
         </form>
       </div>
     </section>

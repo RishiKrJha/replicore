@@ -1,6 +1,7 @@
 from functools import wraps
 from io import BytesIO
 
+from werkzeug.utils import secure_filename
 from flask import Blueprint, current_app, flash, redirect, render_template, request, send_file, session, url_for
 
 bp = Blueprint("portal", __name__)
@@ -53,17 +54,25 @@ def admin_dashboard():
                            events=service.events(), admin=True)
 
 
+@bp.after_request
+def add_security_headers(response):
+    response.headers['X-Content-Type-Options'] = 'nosniff'
+    response.headers['X-Frame-Options'] = 'SAMEORIGIN'
+    response.headers['X-XSS-Protection'] = '1; mode=block'
+    return response
+
 @bp.post("/objects/upload")
 def upload():
-    upload = request.files.get("file")
-    if not upload or not upload.filename:
+    upload_file = request.files.get("file")
+    if not upload_file or not upload_file.filename:
         flash("Choose a file", "error")
-    elif not allowed_file(upload.filename):
+    elif not allowed_file(upload_file.filename):
         flash(f"Invalid file type. Allowed: {', '.join(ALLOWED_EXTENSIONS)}", "error")
     else:
         service = current_app.extensions["vault"]
         factor = int(request.form.get("replication_factor", current_app.config["DEFAULT_REPLICATION_FACTOR"]))
-        obj = service.create_real(upload.filename, upload.read(), factor)
+        safe_name = secure_filename(upload_file.filename) or "unnamed_file"
+        obj = service.create_real(safe_name, upload_file.read(), factor)
         flash(f"Uploaded {obj['filename']} as {obj['id']}", "success")
     return redirect(url_for("portal.dashboard"))
 

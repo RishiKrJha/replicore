@@ -49,5 +49,8 @@ class Database:
                     FOREIGN KEY(object_id) REFERENCES objects(id),
                     FOREIGN KEY(node_id) REFERENCES nodes(id)
                 );
+                CREATE INDEX IF NOT EXISTS idx_replicas_object_id ON replicas(object_id);
+                CREATE INDEX IF NOT EXISTS idx_events_object_id ON operation_events(object_id);
+                CREATE INDEX IF NOT EXISTS idx_events_created_at ON operation_events(created_at DESC);
                 """
             )
